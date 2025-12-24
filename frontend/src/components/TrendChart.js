@@ -69,11 +69,11 @@ const TrendChart = ({ checkpoint, mode, currentHour }) => {
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white border border-slate-200 rounded-lg shadow-lg p-3">
-          <p className="text-sm font-semibold text-slate-900 mb-2">{label}</p>
+        <div className="bg-white/95 backdrop-blur-sm border-2 border-primary-200 rounded-xl shadow-hard p-4">
+          <p className="text-sm font-black text-slate-900 mb-3 uppercase tracking-wide">{label}</p>
           {payload.map((entry, index) => (
-            <p key={index} className="text-sm" style={{ color: entry.color }}>
-              {entry.name}: <span className="font-bold">{entry.value} min</span>
+            <p key={index} className="text-sm font-medium mb-1" style={{ color: entry.color }}>
+              {entry.name}: <span className="font-black">{entry.value} min</span>
             </p>
           ))}
         </div>
@@ -83,11 +83,13 @@ const TrendChart = ({ checkpoint, mode, currentHour }) => {
   };
 
   return (
-    <div className="w-full h-[400px] bg-white rounded-xl border border-slate-200 p-6">
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold text-slate-900 mb-1">24-Hour Traffic Forecast</h3>
-        <p className="text-sm text-slate-600">
-          Predicted travel time throughout the day ({checkpoint === 'woodlands' ? 'Woodlands' : 'Tuas'} • {mode === 'car' ? 'Car' : 'Bus'})
+    <div className="w-full h-[450px] bg-gradient-to-br from-white to-slate-50 rounded-2xl border border-slate-200 p-8 shadow-soft hover:shadow-medium transition-all duration-300">
+      <div className="mb-6">
+        <h3 className="text-xl font-black text-slate-900 mb-2 flex items-center gap-2">
+          📊 24-Hour Traffic Forecast
+        </h3>
+        <p className="text-sm text-slate-600 font-medium">
+          Predicted travel time throughout the day • {checkpoint === 'woodlands' ? '🌉 Woodlands' : '🌁 Tuas'} • {mode === 'car' ? '🚗 Car' : '🚌 Bus'}
         </p>
       </div>
 

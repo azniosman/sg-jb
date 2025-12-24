@@ -47,24 +47,26 @@ const CameraFeeds = ({ checkpoint }) => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-2">
         <div>
-          <h3 className="text-lg font-semibold text-slate-900">Live Camera Feeds</h3>
-          <p className="text-sm text-slate-600 mt-1">
-            Real-time views of {checkpoint === 'woodlands' ? 'Woodlands Checkpoint' : 'Tuas Second Link'}
+          <h3 className="text-xl font-black text-slate-900 flex items-center gap-2 mb-1">
+            📹 Live Camera Feeds
+          </h3>
+          <p className="text-sm text-slate-600 font-medium">
+            Real-time views of {checkpoint === 'woodlands' ? '🌉 Woodlands Checkpoint' : '🌁 Tuas Second Link'}
           </p>
         </div>
-        <div className="flex items-center gap-2 text-green-600">
-          <Wifi className="w-4 h-4" />
-          <span className="text-sm font-medium">All cameras online</span>
+        <div className="flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-200 rounded-xl">
+          <Wifi className="w-4 h-4 text-green-600 animate-pulse" />
+          <span className="text-sm font-bold text-green-700">Online</span>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {cameras.map((camera) => (
           <div
             key={camera.id}
-            className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden"
+            className="group bg-white rounded-2xl shadow-medium border border-slate-200 overflow-hidden hover:shadow-hard transition-all duration-300 hover:scale-105"
           >
             {/* Camera View */}
             <div className="relative bg-slate-900 aspect-video">
@@ -101,22 +103,22 @@ const CameraFeeds = ({ checkpoint }) => {
               </div>
 
               {/* Live indicator */}
-              <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-red-600 px-2 py-1 rounded-full">
+              <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-gradient-to-r from-red-600 to-red-500 px-3 py-1.5 rounded-full shadow-lg">
                 <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
-                <span className="text-xs font-semibold text-white">LIVE</span>
+                <span className="text-xs font-black text-white tracking-wide">LIVE</span>
               </div>
             </div>
 
             {/* Camera Info */}
-            <div className="p-4">
+            <div className="p-5 bg-gradient-to-br from-white to-slate-50">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <h4 className="text-sm font-semibold text-slate-900 mb-1">{camera.name}</h4>
-                  <p className="text-xs text-slate-600">Updated: {camera.lastUpdate}</p>
+                  <h4 className="text-sm font-bold text-slate-900 mb-1.5">{camera.name}</h4>
+                  <p className="text-xs text-slate-600 font-medium">Updated: {camera.lastUpdate}</p>
                 </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-2 h-2 bg-green-500 rounded-full" />
-                  <span className="text-xs text-green-600 font-medium">{camera.status}</span>
+                <div className="flex items-center gap-1.5 px-2 py-1 bg-green-100 rounded-full">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                  <span className="text-[10px] text-green-700 font-bold uppercase">{camera.status}</span>
                 </div>
               </div>
             </div>
@@ -125,9 +127,9 @@ const CameraFeeds = ({ checkpoint }) => {
       </div>
 
       {/* Disclaimer */}
-      <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
-        <p className="text-xs text-slate-600">
-          <strong>Note:</strong> Camera feeds are simulated for demonstration purposes. In production, these would connect to actual CCTV streams via secure APIs.
+      <div className="bg-gradient-to-r from-slate-50 to-blue-50/30 border-2 border-slate-200 rounded-2xl p-5 shadow-soft">
+        <p className="text-xs text-slate-700 font-medium leading-relaxed">
+          <strong className="font-black text-slate-900">ℹ️ Note:</strong> Camera feeds are simulated for demonstration purposes. In production, these would connect to actual CCTV streams via secure APIs.
         </p>
       </div>
     </div>

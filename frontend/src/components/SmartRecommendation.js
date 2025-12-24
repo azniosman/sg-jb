@@ -72,23 +72,25 @@ const SmartRecommendation = ({ currentTime, currentDuration, checkpoint, mode })
   };
 
   return (
-    <div className="bg-gradient-to-r from-amber-50 to-yellow-50 rounded-xl shadow-sm border-2 border-amber-300 p-6">
+    <div className="bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 rounded-2xl shadow-medium border-2 border-amber-300/50 p-6 hover:shadow-hard transition-all duration-300 animate-slide-up">
       <div className="flex items-start gap-4">
-        <div className="w-12 h-12 rounded-xl bg-amber-400 flex items-center justify-center flex-shrink-0">
-          <Lightbulb className="w-6 h-6 text-white" />
+        <div className="p-3 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-md flex items-center justify-center flex-shrink-0">
+          <Lightbulb className="w-7 h-7 text-white" />
         </div>
         <div className="flex-1">
-          <div className="flex items-center gap-2 mb-2">
-            <h3 className="text-lg font-bold text-amber-900">💡 Smart Tip</h3>
+          <div className="flex items-center gap-2 mb-3">
+            <h3 className="text-base font-black text-amber-900 uppercase tracking-wide">💡 Smart Tip</h3>
           </div>
-          <p className="text-amber-800 font-medium mb-3">
+          <p className="text-amber-900 font-bold mb-3 text-sm leading-relaxed">
             Depart {getOffsetText(bestOption.offset)} ({formatTime(bestOption.hour, bestOption.minute)}) to save{' '}
-            <span className="font-bold text-amber-900">{Math.round(bestOption.savings)} minutes</span>
+            <span className="inline-block px-2 py-1 bg-amber-200 rounded-lg text-amber-900 font-black">
+              {Math.round(bestOption.savings)} min
+            </span>
           </p>
-          <div className="flex items-center gap-2 text-sm text-amber-700">
+          <div className="flex items-center gap-2 text-xs text-amber-800 bg-white/50 rounded-lg px-3 py-2 font-medium">
             <Clock className="w-4 h-4" />
             <span>
-              Estimated duration: {bestOption.duration} min (vs {Math.round(currentDuration)} min now)
+              {bestOption.duration} min (vs {Math.round(currentDuration)} min now)
             </span>
           </div>
         </div>

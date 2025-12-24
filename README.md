@@ -9,6 +9,7 @@ A web application that predicts travel times between Singapore and Johor Bahru (
 
 ## ✨ Features
 
+### Core Functionality
 - **🤖 ML-Powered Predictions**: XGBoost/LightGBM models for accurate travel time forecasts
 - **📅 Holiday Awareness**: Accounts for Singapore & Malaysia public and school holidays
 - **🌦️ Weather Integration**: Real-time weather data from OpenWeatherMap API
@@ -16,10 +17,22 @@ A web application that predicts travel times between Singapore and Johor Bahru (
 - **⏱️ Checkpoint Wait Times**: Pattern-based estimation for Woodlands and Tuas checkpoints
 - **💾 Historical Data Collection**: User-contributed actual crossing times for continuous improvement
 - **🗺️ Interactive Map**: Visual route display with congestion-based coloring
-- **📊 Historical Analytics**: Charts showing travel time trends over time
-- **🔄 Scenario Analysis**: Compare multiple departure times to find optimal travel windows
-- **⚠️ Smart Alerts**: Notifications for peak congestion periods
-- **📱 Responsive Design**: Works seamlessly on desktop and mobile devices
+- **📊 24-Hour Forecast**: Charts showing predicted travel times throughout the day
+- **💡 Smart Recommendations**: AI-powered suggestions for optimal departure times
+- **⚠️ Congestion Alerts**: Real-time notifications for peak traffic periods
+- **🙋 Crowd-Sourced Status**: Waze-style immigration hall status reporting
+- **📹 Live Cameras**: Mock camera feeds for checkpoint monitoring (demo)
+
+### Modern UI/UX Design
+- **🎨 Professional Design System**: Built with Tailwind CSS and modern design principles
+- **✨ Glassmorphism Effects**: Frosted glass backdrop blur on header and overlays
+- **🌈 Gradient Aesthetics**: Beautiful color gradients throughout the interface
+- **💫 Smooth Animations**: Fade-in, slide-up, scale, and pulse effects
+- **🎯 Bold Typography**: Clear visual hierarchy with font-black weights
+- **🔦 Glow Effects**: Interactive elements with hover glow and shadow transitions
+- **📐 Modern Shadows**: Multi-level depth (soft, medium, hard) for professional look
+- **🖱️ Micro-Interactions**: Scale transforms, color transitions, and hover effects
+- **📱 Fully Responsive**: Mobile-first design that works on all screen sizes
 - **☁️ Cloud Ready**: Containerized deployment to Google Cloud Run
 
 ## 🏗️ Architecture
@@ -345,6 +358,103 @@ Get database statistics.
 }
 ```
 
+## 🎨 Frontend Design System
+
+The application features a modern, professional UI built with React 18 and Tailwind CSS.
+
+### Design Tokens
+
+**Custom Shadows:**
+- `shadow-soft`: Subtle elevation for cards
+- `shadow-medium`: Standard card depth
+- `shadow-hard`: Prominent elevation for modals
+- `shadow-glow`: Blue glow effect for interactive elements
+- `shadow-inner-soft`: Inset shadow for inputs
+
+**Gradient Backgrounds:**
+- `gradient-info`: Blue gradient (primary actions)
+- `gradient-success`: Green gradient (success states)
+- `gradient-warning`: Orange gradient (warnings)
+- `gradient-danger`: Red gradient (alerts)
+- `gradient-glass`: Transparent glass effect
+
+**Animations:**
+- `animate-fade-in`: Smooth fade-in effect
+- `animate-slide-up`: Slide up from bottom
+- `animate-slide-down`: Slide down from top
+- `animate-scale-in`: Scale up animation
+- `animate-pulse-soft`: Gentle pulsing effect
+- `animate-shimmer`: Shimmer loading effect
+
+### Component Styling
+
+**Cards:**
+- Rounded corners (2xl: 1.5rem)
+- Gradient backgrounds
+- Hover scale transformations
+- Smooth shadow transitions
+
+**Buttons:**
+- Gradient backgrounds for active states
+- Scale animations on hover (scale-105)
+- Bold typography (font-black)
+- Icon + text combinations
+
+**Form Inputs:**
+- Soft background (slate-50)
+- Focus ring with primary color
+- Rounded corners (xl: 1rem)
+- Smooth transitions
+
+**Interactive Elements:**
+- 300ms transition duration
+- Hover glow effects
+- Color transformations
+- Scale feedback
+
+### Color Palette
+
+**Primary Blue:**
+- 50-900 scale from light to dark
+- Used for: buttons, links, accents
+
+**Status Colors:**
+- Green: Low congestion, success states
+- Yellow: Moderate congestion, warnings
+- Orange: High congestion, cautions
+- Red: Severe congestion, errors
+
+**Neutral Grays:**
+- Slate scale (50-900)
+- Used for: text, backgrounds, borders
+
+### Typography
+
+**Font Weights:**
+- `font-medium` (500): Body text
+- `font-bold` (700): Emphasis
+- `font-black` (900): Headings, important data
+
+**Text Sizes:**
+- `text-xs` (0.75rem): Timestamps, labels
+- `text-sm` (0.875rem): Body text
+- `text-lg` (1.125rem): Subheadings
+- `text-2xl` (1.5rem): Main headings
+- `text-3xl` (1.875rem): Hero text
+
+**Custom Features:**
+- Gradient text backgrounds
+- Uppercase tracking for labels
+- Line height optimization
+
+### Accessibility
+
+- WCAG 2.1 AA compliant color contrasts
+- Focus states on all interactive elements
+- Smooth scroll behavior
+- Keyboard navigation support
+- Custom scrollbar styling
+
 ## 🧠 ML Model Training
 
 ### Training the Model
@@ -542,10 +652,13 @@ For issues and questions:
 - [x] ✅ Real-time traffic integration
 - [x] ✅ Historical data from actual crossings
 - [x] ✅ Border checkpoint wait times
+- [x] ✅ Modern UI/UX with glassmorphism and animations
+- [x] ✅ Smart departure time recommendations
+- [x] ✅ Crowd-sourced immigration status reporting
+- [x] ✅ 24-hour traffic forecast charts
 - [ ] Push notifications for congestion alerts
 - [ ] Mobile apps (iOS/Android)
 - [ ] Integration with taxi/ride-sharing APIs
 - [ ] Multi-route optimization
 - [ ] Parking availability at checkpoints
-- [ ] Live traffic camera feeds
-- [ ] Crowd-sourced real-time updates
+- [ ] Real live traffic camera feeds (currently mock)

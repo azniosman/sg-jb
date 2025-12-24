@@ -21,8 +21,8 @@ const SchematicMap = ({ selectedRoute, congestionLevel, direction }) => {
   const isTuas = selectedRoute === 'tuas';
 
   return (
-    <div className="w-full h-[400px] bg-gradient-to-br from-blue-50 to-slate-50 rounded-xl border border-slate-200 p-6">
-      <svg viewBox="0 0 800 400" className="w-full h-full">
+    <div className="w-full h-[450px] bg-gradient-to-br from-blue-50 via-indigo-50/30 to-slate-50 rounded-2xl border border-slate-200 p-8 shadow-soft hover:shadow-medium transition-all duration-300">
+      <svg viewBox="0 0 800 400" className="w-full h-full drop-shadow-sm">
         {/* Water (Straits of Johor) */}
         <rect x="0" y="150" width="800" height="100" fill="#bfdbfe" opacity="0.5" />
         <text x="400" y="205" textAnchor="middle" fill="#60a5fa" fontSize="14" fontWeight="500">
