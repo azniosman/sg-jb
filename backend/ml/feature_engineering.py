@@ -215,7 +215,7 @@ if __name__ == "__main__":
     # Example usage
     logging.basicConfig(level=logging.INFO)
 
-    from data_loader import generate_synthetic_data
+    from .data_loader import generate_synthetic_data
 
     # Generate data
     df = generate_synthetic_data(1000)

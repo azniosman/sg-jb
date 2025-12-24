@@ -35,7 +35,7 @@ def generate_synthetic_data(num_samples: int = 10000) -> pd.DataFrame:
         random_hour = np.random.randint(0, 24)
         random_minute = np.random.choice([0, 15, 30, 45])
 
-        travel_datetime = start_date + timedelta(days=random_days, hours=random_hour, minutes=random_minute)
+        travel_datetime = start_date + timedelta(days=int(random_days), hours=int(random_hour), minutes=int(random_minute))
 
         # Base travel time
         base_time = 30.0
