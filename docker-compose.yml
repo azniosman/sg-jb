@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: sg-jb-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - ENVIRONMENT=development
+      - LOG_LEVEL=INFO
+      - CORS_ORIGINS=http://localhost:3000,http://localhost:80
+      # Add your API keys here or use .env file
+      - OPENWEATHER_API_KEY=${OPENWEATHER_API_KEY:-}
+      - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY:-}
+      - LTA_DATAMALL_API_KEY=${LTA_DATAMALL_API_KEY:-}
+    volumes:
+      - ./backend/models:/app/models
+      - ./backend/app:/app/app
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: sg-jb-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    environment:
+      - REACT_APP_API_URL=http://backend:8000
+
+networks:
+  default:
+    name: sg-jb-network

@@ -1,0 +1,37 @@
+.charts-container {
+  padding: 1.5rem;
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.charts-container h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 1.5rem 0;
+}
+
+.charts-container h4 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #475569;
+  margin: 1.5rem 0 0.75rem 0;
+}
+
+.chart-wrapper {
+  margin-bottom: 1rem;
+}
+
+.loading,
+.error,
+.no-data {
+  padding: 2rem;
+  text-align: center;
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.error {
+  color: #ef4444;
+}

@@ -1,0 +1,185 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.app {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.sidebar-container {
+  width: 320px;
+  flex-shrink: 0;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.map-section {
+  height: 50%;
+  background: #f1f5f9;
+}
+
+.results-section {
+  height: 50%;
+  overflow-y: auto;
+  padding: 1.5rem;
+  background: #f8fafc;
+}
+
+/* Error Message */
+.error-message {
+  padding: 1rem;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 0.5rem;
+  color: #991b1b;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Prediction Card */
+.prediction-card {
+  background: white;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1rem;
+}
+
+.prediction-card h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 1rem;
+}
+
+.prediction-time {
+  text-align: center;
+}
+
+.time-value {
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: #3b82f6;
+  line-height: 1;
+}
+
+.time-value .unit {
+  font-size: 1.5rem;
+  color: #64748b;
+  margin-left: 0.25rem;
+}
+
+.time-range {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+/* Welcome Message */
+.welcome-message {
+  background: white;
+  border-radius: 0.5rem;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.welcome-message h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 0.75rem;
+}
+
+.welcome-message > p {
+  font-size: 1rem;
+  color: #64748b;
+  margin-bottom: 2rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.feature {
+  padding: 1rem;
+}
+
+.feature-icon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.feature h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 0.5rem;
+}
+
+.feature p {
+  font-size: 0.875rem;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .app {
+    flex-direction: column;
+  }
+
+  .sidebar-container {
+    width: 100%;
+    height: auto;
+    max-height: 40vh;
+  }
+
+  .main-content {
+    height: 60vh;
+  }
+
+  .map-section {
+    height: 40%;
+  }
+
+  .results-section {
+    height: 60%;
+  }
+}
+
+@media (max-width: 768px) {
+  .features {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar-container {
+    max-height: 50vh;
+  }
+}

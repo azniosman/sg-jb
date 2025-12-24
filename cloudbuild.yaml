@@ -1,0 +1,74 @@
+# Google Cloud Build configuration for Cloud Run deployment
+
+steps:
+  # Build backend Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/sg-jb-backend:$COMMIT_SHA'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/sg-jb-backend:latest'
+      - './backend'
+
+  # Push backend image to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/sg-jb-backend:$COMMIT_SHA'
+
+  # Deploy backend to Cloud Run
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'sg-jb-backend'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/sg-jb-backend:$COMMIT_SHA'
+      - '--region'
+      - 'asia-southeast1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--set-env-vars'
+      - 'ENVIRONMENT=production,USE_GCS=true'
+      - '--set-secrets'
+      - 'OPENWEATHER_API_KEY=openweather-api-key:latest,GOOGLE_MAPS_API_KEY=google-maps-api-key:latest'
+
+  # Build frontend Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/sg-jb-frontend:$COMMIT_SHA'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/sg-jb-frontend:latest'
+      - '--build-arg'
+      - 'REACT_APP_API_URL=https://sg-jb-backend-XXXXXXXXXX.a.run.app'
+      - './frontend'
+
+  # Push frontend image to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/sg-jb-frontend:$COMMIT_SHA'
+
+  # Deploy frontend to Cloud Run
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'sg-jb-frontend'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/sg-jb-frontend:$COMMIT_SHA'
+      - '--region'
+      - 'asia-southeast1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+
+images:
+  - 'gcr.io/$PROJECT_ID/sg-jb-backend:$COMMIT_SHA'
+  - 'gcr.io/$PROJECT_ID/sg-jb-frontend:$COMMIT_SHA'
+
+timeout: 1200s
