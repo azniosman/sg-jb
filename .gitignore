@@ -1,5 +1,6 @@
 # Claude Code CLI directory
 .claude/
+CLAUDE.md
 
 # Dependencies
 node_modules/
