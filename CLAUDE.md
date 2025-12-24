@@ -21,10 +21,15 @@ This is a production-ready web application that predicts travel times between Si
 docker-compose up --build
 
 # Backend development (from backend/)
-python -m venv venv && source venv/bin/activate  # Setup venv
-pip install -r requirements.txt                   # Install deps
+conda env create -f environment.yml              # Setup conda env (recommended)
+conda activate sg-jb-backend                     # Activate environment
 uvicorn app.main:app --reload --port 8000        # Run dev server
 python -m pytest                                  # Run tests
+
+# Test new real-time endpoints
+curl "http://localhost:8000/api/v1/traffic/live?origin=singapore&destination=jb"
+curl "http://localhost:8000/api/v1/checkpoint/wait-time?checkpoint=woodlands"
+curl http://localhost:8000/api/v1/stats           # Database statistics
 
 # Train ML model (from backend/)
 python -m ml.train_model --model xgboost         # Train XGBoost
@@ -56,10 +61,12 @@ gsutil cp backend/models/travel_time_model.joblib gs://sg-jb-ml-models/
 ### Backend Structure (`backend/app/`)
 
 - **main.py**: FastAPI application initialization, CORS setup, lifespan management
-- **routes.py**: API endpoints (`/predict`, `/simulate`, `/historical`)
+- **routes.py**: API endpoints (`/predict`, `/simulate`, `/historical`, `/traffic/live`, `/checkpoint/wait-time`, `/crossings/*`)
 - **model.py**: ML model loading (local or GCS), prediction with confidence intervals
 - **utils.py**: Feature engineering, holiday checking, weather/traffic APIs
 - **config.py**: Pydantic settings, environment variable management
+- **traffic_apis.py**: Real-time traffic integration (Google Maps, LTA DataMall), checkpoint wait time estimation
+- **database.py**: SQLite database for historical crossing data and traffic snapshots
 
 ### ML Pipeline (`backend/ml/`)
 
@@ -123,6 +130,38 @@ Peak multipliers:
 - Weekend: 0.7x reduction
 - Rain >5mm: 1.3x increase
 
+### Real-Time Traffic Integration
+
+The app now integrates real-time traffic data from multiple sources:
+
+**Google Maps Distance Matrix API** (`/api/v1/traffic/live`):
+- Provides current travel duration with traffic conditions
+- Returns traffic multiplier (actual vs. normal duration ratio)
+- Automatically stores snapshots in database for analysis
+- Used to adjust predictions for same-day travel
+
+**Checkpoint Wait Time Estimation** (`/api/v1/checkpoint/wait-time`):
+- Pattern-based estimation using historical data
+- Considers time of day, day of week, holidays
+- Separate patterns for Woodlands and Tuas checkpoints
+- Provides min/max range with confidence level
+
+**Historical Data Collection** (`/api/v1/crossings/*`):
+- Users can submit actual crossing times via `/crossings/submit`
+- Stores actual travel times, wait times, conditions
+- Enables continuous model improvement
+- Accessible via `/crossings/recent` and `/stats` endpoints
+
+**Database Schema** (SQLite):
+- `crossings` table: Historical crossing records with predictions vs. actuals
+- `traffic_snapshots` table: Real-time traffic data snapshots
+- Indexed by timestamp and checkpoint for fast queries
+
+The prediction endpoint (`/predict`) automatically incorporates:
+- Real-time traffic multiplier for same-day predictions
+- Estimated checkpoint wait time based on travel hour
+- Historical patterns from database
+
 ### Model Loading
 
 Two modes:
@@ -151,7 +190,8 @@ Congestion levels based on predicted/base time ratio:
 
 Critical variables:
 - `OPENWEATHER_API_KEY`: For weather data (recommended)
-- `GOOGLE_MAPS_API_KEY`: For traffic data (optional)
+- `GOOGLE_MAPS_API_KEY`: For real-time traffic data from Google Maps Distance Matrix API (required for live traffic)
+- `LTA_DATAMALL_API_KEY`: For Singapore LTA traffic cameras and speed bands (optional)
 - `USE_GCS`: Set to `true` for Cloud Run deployment
 - `GCS_BUCKET_NAME`, `MODEL_BLOB_NAME`: GCS model location
 

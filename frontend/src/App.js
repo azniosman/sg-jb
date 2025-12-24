@@ -1,12 +1,12 @@
 /**
  * Main App component - redesigned to match UI/UX reference
  */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import TrafficVisualization from './components/TrafficVisualization';
 import ForecastChart from './components/ForecastChart';
 import HeavyCongestionAlert from './components/HeavyCongestionAlert';
-import { predictTravelTime } from './services/api';
+import { predictTravelTime, getWaitTime } from './services/api';
 import './App.css';
 
 function App() {
@@ -14,6 +14,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [currentScenario, setCurrentScenario] = useState(null);
+  const [waitTimeData, setWaitTimeData] = useState(null);
 
   const handlePredict = async (formData) => {
     setLoading(true);
@@ -23,6 +24,20 @@ function App() {
       const result = await predictTravelTime(formData);
       setPrediction(result);
       setCurrentScenario(formData);
+
+      // Fetch wait time estimate
+      try {
+        const checkpoint = formData.origin.toLowerCase() === 'singapore' ? 'woodlands' : 'woodlands';
+        const waitTime = await getWaitTime(
+          checkpoint,
+          formData.origin,
+          formData.destination
+        );
+        setWaitTimeData(waitTime);
+      } catch (waitErr) {
+        console.warn('Failed to fetch wait time:', waitErr);
+        setWaitTimeData(null);
+      }
     } catch (err) {
       setError('Failed to get prediction. Please try again.');
       console.error(err);
@@ -98,13 +113,21 @@ function App() {
                   </div>
                 </div>
 
-                {/* Weather Card */}
+                {/* Wait Time Card */}
                 <div className="info-card">
-                  <div className="info-card-icon purple">{getWeatherIcon()}</div>
+                  <div className="info-card-icon purple">⏱️</div>
                   <div className="info-card-content">
-                    <h3>Forecast Weather</h3>
-                    <div className="info-card-value">{getTemperature()}°C</div>
-                    <div className="info-card-subtext">{getWeatherCondition()}</div>
+                    <h3>Checkpoint Wait</h3>
+                    <div className="info-card-value">
+                      {waitTimeData
+                        ? `${Math.round(waitTimeData.estimated_wait_minutes)} min`
+                        : '--'}
+                    </div>
+                    <div className="info-card-subtext">
+                      {waitTimeData
+                        ? `Range: ${Math.round(waitTimeData.min_wait_minutes)}-${Math.round(waitTimeData.max_wait_minutes)} min`
+                        : 'Estimating...'}
+                    </div>
                   </div>
                 </div>
               </div>
