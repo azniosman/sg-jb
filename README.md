@@ -12,6 +12,9 @@ A web application that predicts travel times between Singapore and Johor Bahru (
 - **🤖 ML-Powered Predictions**: XGBoost/LightGBM models for accurate travel time forecasts
 - **📅 Holiday Awareness**: Accounts for Singapore & Malaysia public and school holidays
 - **🌦️ Weather Integration**: Real-time weather data from OpenWeatherMap API
+- **🚦 Real-Time Traffic**: Live traffic data from Google Maps Distance Matrix API
+- **⏱️ Checkpoint Wait Times**: Pattern-based estimation for Woodlands and Tuas checkpoints
+- **💾 Historical Data Collection**: User-contributed actual crossing times for continuous improvement
 - **🗺️ Interactive Map**: Visual route display with congestion-based coloring
 - **📊 Historical Analytics**: Charts showing travel time trends over time
 - **🔄 Scenario Analysis**: Compare multiple departure times to find optimal travel windows
@@ -29,11 +32,14 @@ sg-jb/
 │   │   ├── routes.py        # API endpoints
 │   │   ├── model.py         # ML model management
 │   │   ├── utils.py         # Feature engineering & APIs
-│   │   └── config.py        # Configuration
+│   │   ├── config.py        # Configuration
+│   │   ├── traffic_apis.py  # Real-time traffic integration
+│   │   └── database.py      # SQLite database for crossings
 │   ├── ml/
 │   │   ├── train_model.py   # Model training script
 │   │   ├── data_loader.py   # Data loading utilities
 │   │   └── feature_engineering.py
+│   ├── data/                # SQLite database storage
 │   └── Dockerfile
 ├── frontend/                 # React frontend
 │   ├── src/
@@ -97,12 +103,14 @@ sg-jb/
 ```bash
 cd backend
 
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+# Create conda environment (recommended)
+conda env create -f environment.yml
+conda activate sg-jb-backend
 
-# Install dependencies
-pip install -r requirements.txt
+# OR use virtual environment
+# python -m venv venv
+# source venv/bin/activate  # On Windows: venv\Scripts\activate
+# pip install -r requirements.txt
 
 # Set up environment
 cp .env.example .env
@@ -225,6 +233,118 @@ Get historical travel time data.
 ]
 ```
 
+#### `GET /api/v1/traffic/live`
+
+Get real-time traffic data from Google Maps.
+
+**Query Parameters:**
+- `origin`: Origin location (default: "singapore")
+- `destination`: Destination location (default: "jb")
+- `checkpoint`: Checkpoint to use (default: "woodlands")
+
+**Response:**
+```json
+{
+  "duration_minutes": 25.2,
+  "duration_in_traffic_minutes": 59.18,
+  "traffic_multiplier": 2.35,
+  "distance_km": 14.546,
+  "timestamp": "2025-12-24T06:50:21.175285",
+  "checkpoint": "woodlands",
+  "direction": "singapore_to_jb"
+}
+```
+
+#### `GET /api/v1/checkpoint/wait-time`
+
+Get estimated checkpoint wait time.
+
+**Query Parameters:**
+- `checkpoint`: Checkpoint name (default: "woodlands")
+- `origin`: Origin location (default: "singapore")
+- `destination`: Destination location (default: "jb")
+- `travel_datetime`: Travel datetime (optional, defaults to now)
+
+**Response:**
+```json
+{
+  "estimated_wait_minutes": 35.0,
+  "min_wait_minutes": 24.5,
+  "max_wait_minutes": 45.5,
+  "confidence": "medium",
+  "checkpoint": "woodlands",
+  "direction": "singapore_to_jb"
+}
+```
+
+#### `POST /api/v1/crossings/submit`
+
+Submit actual crossing data to improve predictions.
+
+**Request Body:**
+```json
+{
+  "checkpoint": "woodlands",
+  "origin": "singapore",
+  "destination": "jb",
+  "mode": "car",
+  "actual_travel_time_minutes": 65.5,
+  "actual_wait_time_minutes": 25.0,
+  "weather_condition": "clear",
+  "notes": "Light traffic today"
+}
+```
+
+**Response:**
+```json
+{
+  "status": "success",
+  "crossing_id": 42,
+  "message": "Thank you for contributing data to improve predictions!"
+}
+```
+
+#### `GET /api/v1/crossings/recent`
+
+Get recent crossing submissions.
+
+**Query Parameters:**
+- `checkpoint`: Filter by checkpoint (optional)
+- `hours`: Hours of history (default: 24)
+- `limit`: Maximum records (default: 100)
+
+**Response:**
+```json
+{
+  "count": 15,
+  "crossings": [
+    {
+      "id": 42,
+      "timestamp": "2025-12-24T08:30:00",
+      "checkpoint": "woodlands",
+      "travel_time_minutes": 65.5,
+      "wait_time_minutes": 25.0,
+      "congestion_level": "moderate"
+    },
+    ...
+  ]
+}
+```
+
+#### `GET /api/v1/stats`
+
+Get database statistics.
+
+**Response:**
+```json
+{
+  "total_crossings": 150,
+  "total_traffic_snapshots": 500,
+  "earliest_crossing": "2025-11-01T06:00:00",
+  "latest_crossing": "2025-12-24T18:30:00"
+}
+```
+
 ## 🧠 ML Model Training
 
 ### Training the Model
@@ -254,7 +374,31 @@ The model uses these engineered features:
 - **Direction**: Singapore to JB or vice versa
 - **Mode**: car, taxi, or bus
 - **Weather**: rainfall (mm), temperature (°C)
+- **Real-time traffic**: traffic multiplier from Google Maps (for same-day predictions)
+- **Wait times**: checkpoint wait time based on historical patterns
 - **Historical**: average travel time for similar conditions
+
+### Real-Time Features
+
+**Live Traffic Integration:**
+- Google Maps Distance Matrix API provides current traffic conditions
+- Traffic multiplier adjusts predictions for same-day travel
+- Automatic storage of traffic snapshots for analysis
+- Fallback to historical patterns when API unavailable
+
+**Checkpoint Wait Times:**
+- Pattern-based estimation using hour/day/checkpoint data
+- Separate models for Woodlands and Tuas checkpoints
+- Weekday vs. weekend patterns
+- Holiday multipliers (1.5x during holidays)
+- Confidence ranges (min/max wait times)
+
+**Historical Data Collection:**
+- User submissions stored in SQLite database
+- Tables: `crossings` and `traffic_snapshots`
+- Indexed by timestamp and checkpoint for fast queries
+- Database location: `backend/data/crossings.db`
+- API endpoints for submitting and retrieving crossing data
 
 ### Data Format
 
@@ -324,11 +468,12 @@ datetime,origin,destination,mode,travel_time_minutes,rain_mm,temp_c
 | `API_HOST` | Host to bind to | No (default: 0.0.0.0) |
 | `API_PORT` | Port to listen on | No (default: 8000) |
 | `OPENWEATHER_API_KEY` | OpenWeatherMap API key | Recommended |
-| `GOOGLE_MAPS_API_KEY` | Google Maps API key | Optional |
-| `LTA_DATAMALL_API_KEY` | LTA DataMall API key | Optional |
+| `GOOGLE_MAPS_API_KEY` | Google Maps API key for live traffic | **Required for real-time features** |
+| `LTA_DATAMALL_API_KEY` | LTA DataMall API key for SG traffic | Optional |
 | `USE_GCS` | Load model from GCS | No (default: false) |
 | `GCS_BUCKET_NAME` | GCS bucket name | If USE_GCS=true |
 | `MODEL_BLOB_NAME` | Model file name in GCS | If USE_GCS=true |
+| `CORS_ORIGINS` | Allowed CORS origins | No (default: localhost) |
 
 ### Frontend Environment Variables
 
@@ -394,11 +539,13 @@ For issues and questions:
 
 ## 🔮 Future Enhancements
 
-- [ ] Real-time traffic integration
+- [x] ✅ Real-time traffic integration
+- [x] ✅ Historical data from actual crossings
+- [x] ✅ Border checkpoint wait times
 - [ ] Push notifications for congestion alerts
 - [ ] Mobile apps (iOS/Android)
-- [ ] Historical data from actual crossings
 - [ ] Integration with taxi/ride-sharing APIs
 - [ ] Multi-route optimization
-- [ ] Border checkpoint wait times
 - [ ] Parking availability at checkpoints
+- [ ] Live traffic camera feeds
+- [ ] Crowd-sourced real-time updates
