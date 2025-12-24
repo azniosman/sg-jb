@@ -1,12 +1,11 @@
 /**
- * Main App component
+ * Main App component - redesigned to match UI/UX reference
  */
 import React, { useState } from 'react';
 import Sidebar from './components/Sidebar';
-import Map from './components/Map';
-import Alerts from './components/Alerts';
-import Charts from './components/Charts';
-import ScenarioAnalysis from './components/ScenarioAnalysis';
+import TrafficVisualization from './components/TrafficVisualization';
+import ForecastChart from './components/ForecastChart';
+import HeavyCongestionAlert from './components/HeavyCongestionAlert';
 import { predictTravelTime } from './services/api';
 import './App.css';
 
@@ -32,72 +31,114 @@ function App() {
     }
   };
 
+  const getWeatherIcon = () => {
+    // Default to sunny for demo
+    return '☀️';
+  };
+
+  const getWeatherCondition = () => {
+    return 'Clear';
+  };
+
+  const getTemperature = () => {
+    return prediction?.features_used?.temp_c
+      ? Math.round(prediction.features_used.temp_c)
+      : 31;
+  };
+
   return (
     <div className="app">
-      {/* Sidebar */}
-      <div className="sidebar-container">
-        <Sidebar onPredict={handlePredict} loading={loading} />
+      <div className="app-header">
+        <span className="app-icon">🚗</span>
+        <h1>SG-JB Travel Predictor</h1>
       </div>
 
-      {/* Main Content */}
-      <div className="main-content">
-        {/* Map Section */}
-        <div className="map-section">
-          <Map
-            origin={currentScenario?.origin || 'singapore'}
-            destination={currentScenario?.destination || 'jb'}
-            congestionLevel={prediction?.congestion_level}
-          />
-        </div>
+      <div className="app-content">
+        {/* Left Sidebar */}
+        <Sidebar onPredict={handlePredict} loading={loading} />
 
-        {/* Results Section */}
-        <div className="results-section">
+        {/* Main Content */}
+        <div className="main-content">
           {error && (
             <div className="error-message">
               <span>⚠️</span> {error}
             </div>
           )}
 
-          {prediction && (
+          {prediction ? (
             <>
-              {/* Alerts */}
-              <Alerts
-                alert={prediction.alert}
-                congestionLevel={prediction.congestion_level}
-              />
-
-              {/* Prediction Results */}
-              <div className="prediction-card">
-                <h2>Predicted Travel Time</h2>
-                <div className="prediction-time">
-                  <div className="time-value">
-                    {Math.round(prediction.predicted_time_minutes)}
-                    <span className="unit">min</span>
+              {/* Info Cards Row */}
+              <div className="info-cards">
+                {/* Predicted Duration Card */}
+                <div className="info-card">
+                  <div className="info-card-icon red">🕐</div>
+                  <div className="info-card-content">
+                    <h3>Predicted Duration</h3>
+                    <div className="info-card-value">
+                      {Math.round(prediction.predicted_time_minutes)} min
+                    </div>
+                    <div className="info-card-subtext">
+                      Range: {Math.round(prediction.lower_bound_minutes)}-
+                      {Math.round(prediction.upper_bound_minutes)} min
+                    </div>
                   </div>
-                  <div className="time-range">
-                    Range: {Math.round(prediction.lower_bound_minutes)} -{' '}
-                    {Math.round(prediction.upper_bound_minutes)} min
+                </div>
+
+                {/* Congestion Level Card */}
+                <div className="info-card">
+                  <div className="info-card-icon blue">🚙</div>
+                  <div className="info-card-content">
+                    <h3>Congestion Level</h3>
+                    <div className="info-card-value">
+                      <span className={`congestion-badge ${prediction.congestion_level}`}>
+                        {prediction.congestion_level}
+                      </span>
+                    </div>
+                    <div className="info-card-subtext">Based on historical data</div>
+                  </div>
+                </div>
+
+                {/* Weather Card */}
+                <div className="info-card">
+                  <div className="info-card-icon purple">{getWeatherIcon()}</div>
+                  <div className="info-card-content">
+                    <h3>Forecast Weather</h3>
+                    <div className="info-card-value">{getTemperature()}°C</div>
+                    <div className="info-card-subtext">{getWeatherCondition()}</div>
                   </div>
                 </div>
               </div>
 
-              {/* Scenario Analysis */}
-              <ScenarioAnalysis baseScenario={currentScenario} />
+              {/* Heavy Congestion Alert */}
+              {(prediction.congestion_level === 'high' ||
+                prediction.congestion_level === 'severe') && (
+                <HeavyCongestionAlert
+                  congestionLevel={prediction.congestion_level}
+                  predictedTime={prediction.predicted_time_minutes}
+                />
+              )}
 
-              {/* Historical Charts */}
-              <Charts
-                origin={currentScenario?.origin}
-                destination={currentScenario?.destination}
-              />
+              {/* Main Grid - Traffic Viz and Forecast Chart */}
+              <div className="main-grid">
+                <TrafficVisualization
+                  origin={currentScenario?.origin}
+                  destination={currentScenario?.destination}
+                  checkpoint={currentScenario?.checkpoint}
+                  congestionLevel={prediction.congestion_level}
+                />
+
+                <ForecastChart
+                  checkpoint={currentScenario?.checkpoint}
+                  date={currentScenario?.travel_date}
+                />
+              </div>
             </>
-          )}
-
-          {!prediction && !error && (
-            <div className="welcome-message">
+          ) : (
+            <div className="welcome-message card">
               <h2>Welcome to SG-JB Travel Predictor</h2>
               <p>
-                Enter your travel details in the sidebar to get started with
-                predicting travel times between Singapore and Johor Bahru.
+                Enter your travel details in the sidebar to get started with predicting
+                travel times between Singapore and Johor Bahru.
               </p>
               <div className="features">
                 <div className="feature">
@@ -112,8 +153,8 @@ function App() {
                 </div>
                 <div className="feature">
                   <span className="feature-icon">📊</span>
-                  <h3>Scenario Analysis</h3>
-                  <p>Compare different times to find the best travel window</p>
+                  <h3>24-Hour Forecast</h3>
+                  <p>View predicted travel times throughout the day</p>
                 </div>
               </div>
             </div>

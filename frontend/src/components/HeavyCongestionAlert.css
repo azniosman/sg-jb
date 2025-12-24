@@ -1,0 +1,33 @@
+.heavy-congestion-alert {
+  background: #fef2f2;
+  border-left: 4px solid #ef4444;
+  border-radius: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.1);
+}
+
+.heavy-congestion-alert .alert-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.heavy-congestion-alert .alert-content {
+  flex: 1;
+}
+
+.heavy-congestion-alert .alert-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #991b1b;
+  margin-bottom: 0.25rem;
+}
+
+.heavy-congestion-alert .alert-message {
+  font-size: 0.875rem;
+  color: #7f1d1d;
+  line-height: 1.5;
+}
