@@ -8,7 +8,11 @@ import {
   Activity, ThumbsUp, AlertTriangle, Check,
   Loader2, Info, Navigation
 } from 'lucide-react';
-import { predictTravelTime, getWaitTime, getLiveTraffic } from './services/api';
+import { predictTravelTime, getWaitTime } from './services/api';
+import SmartRecommendation from './components/SmartRecommendation';
+import SchematicMap from './components/SchematicMap';
+import TrendChart from './components/TrendChart';
+import CameraFeeds from './components/CameraFeeds';
 
 function App() {
   // State management
@@ -287,6 +291,16 @@ function App() {
               </div>
             </div>
 
+            {/* Smart Recommendation */}
+            {prediction && (
+              <SmartRecommendation
+                currentTime={travelTime}
+                currentDuration={prediction.predicted_time_minutes}
+                checkpoint={route}
+                mode={mode}
+              />
+            )}
+
             {/* Crowd Reporting Card */}
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
               <div className="flex items-center gap-2 mb-4">
@@ -491,13 +505,52 @@ function App() {
                   </div>
                 )}
 
-                {/* Placeholder for visualizations - will implement next */}
-                <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                  <div className="text-center text-slate-500 py-12">
-                    <TrendingUp className="w-12 h-12 mx-auto mb-3 text-slate-400" />
-                    <p>Visualizations coming next...</p>
-                    <p className="text-sm mt-2">Custom SVG map, 24-hour chart, and live cameras</p>
+                {/* Tabbed Visualizations */}
+                <div className="space-y-6">
+                  {/* Tab Buttons */}
+                  <div className="flex items-center gap-2 border-b border-slate-200">
+                    <button
+                      onClick={() => setActiveTab('forecast')}
+                      className={`px-6 py-3 font-semibold text-sm transition-all ${
+                        activeTab === 'forecast'
+                          ? 'text-primary-600 border-b-2 border-primary-600'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      📊 Traffic Forecast
+                    </button>
+                    <button
+                      onClick={() => setActiveTab('cameras')}
+                      className={`px-6 py-3 font-semibold text-sm transition-all ${
+                        activeTab === 'cameras'
+                          ? 'text-primary-600 border-b-2 border-primary-600'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      📹 Live Cameras
+                    </button>
                   </div>
+
+                  {/* Tab Content */}
+                  {activeTab === 'forecast' ? (
+                    <div className="space-y-6">
+                      {/* Schematic Map */}
+                      <SchematicMap
+                        selectedRoute={route}
+                        congestionLevel={prediction.congestion_level}
+                        direction={destination}
+                      />
+
+                      {/* 24-Hour Trend Chart */}
+                      <TrendChart
+                        checkpoint={route}
+                        mode={mode}
+                        currentHour={parseInt(travelTime.split(':')[0])}
+                      />
+                    </div>
+                  ) : (
+                    <CameraFeeds checkpoint={route} />
+                  )}
                 </div>
               </>
             ) : (
