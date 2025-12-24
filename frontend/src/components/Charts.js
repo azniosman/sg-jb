@@ -24,6 +24,7 @@ const Charts = ({ origin, destination }) => {
 
   useEffect(() => {
     fetchHistoricalData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [origin, destination]);
 
   const fetchHistoricalData = async () => {

@@ -31,8 +31,8 @@ const Map = ({ origin, destination, congestionLevel }) => {
     (originCoords[1] + destCoords[1]) / 2,
   ];
 
-  // Polyline color based on congestion
-  const getLineColor = () => {
+  // Polyline color based on congestion (moved into useMemo)
+  const lineColor = useMemo(() => {
     switch (congestionLevel) {
       case 'low':
         return '#22c55e'; // green
@@ -45,9 +45,7 @@ const Map = ({ origin, destination, congestionLevel }) => {
       default:
         return '#3b82f6'; // blue
     }
-  };
-
-  const lineColor = useMemo(() => getLineColor(), [congestionLevel]);
+  }, [congestionLevel]);
 
   return (
     <div style={{ height: '100%', width: '100%' }}>

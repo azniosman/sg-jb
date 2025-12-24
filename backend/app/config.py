@@ -27,14 +27,21 @@ class Settings(BaseSettings):
     use_gcs: bool = False
 
     # CORS
-    cors_origins: List[str] = ["http://localhost:3000", "http://localhost:5173"]
+    cors_origins: str = "http://localhost:3000,http://localhost:5173"
 
     # Logging
     log_level: str = "INFO"
 
-    class Config:
-        env_file = ".env"
-        case_sensitive = False
+    model_config = {
+        "protected_namespaces": (),  # Disable protected namespace warnings
+        "env_file": ".env",
+        "case_sensitive": False
+    }
+
+    @property
+    def cors_origins_list(self) -> List[str]:
+        """Convert comma-separated CORS origins to list"""
+        return [origin.strip() for origin in self.cors_origins.split(",")]
 
 
 settings = Settings()
