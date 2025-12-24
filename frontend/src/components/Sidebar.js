@@ -1,33 +1,22 @@
 /**
- * Sidebar component for user input
+ * Travel Plan Sidebar - matches UI/UX design
  */
 import React, { useState } from 'react';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 import './Sidebar.css';
 
 const Sidebar = ({ onPredict, loading }) => {
   const [formData, setFormData] = useState({
+    checkpoint: 'woodlands',
     origin: 'singapore',
     destination: 'jb',
-    travel_date: new Date(),
-    travel_time: '08:00',
+    travel_date: new Date().toISOString().split('T')[0],
+    travel_time: '18:00',
     mode: 'car',
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // Format date as YYYY-MM-DD
-    const year = formData.travel_date.getFullYear();
-    const month = String(formData.travel_date.getMonth() + 1).padStart(2, '0');
-    const day = String(formData.travel_date.getDate()).padStart(2, '0');
-    const dateStr = `${year}-${month}-${day}`;
-
-    onPredict({
-      ...formData,
-      travel_date: dateStr,
-    });
+    onPredict(formData);
   };
 
   const handleChange = (field, value) => {
@@ -37,76 +26,111 @@ const Sidebar = ({ onPredict, loading }) => {
     }));
   };
 
+  const handleSwap = () => {
+    setFormData((prev) => ({
+      ...prev,
+      origin: prev.destination,
+      destination: prev.origin,
+    }));
+  };
+
+  const getCheckpointName = () => {
+    return formData.checkpoint === 'woodlands'
+      ? 'Woodlands (Causeway)'
+      : 'Tuas (Second Link)';
+  };
+
+  const isHolidayPeriod = () => {
+    const date = new Date(formData.travel_date);
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+
+    // Check for common holiday periods
+    if ((month === 12 && day >= 20) || month === 1) return true;
+    if (month === 6 || month === 11 || month === 12) return true;
+
+    return false;
+  };
+
   return (
-    <div className="sidebar">
-      <div className="sidebar-header">
-        <h1>🚗 SG-JB Travel Predictor</h1>
-        <p>Predict travel times between Singapore and Johor Bahru</p>
+    <div className="travel-plan-card">
+      <div className="card-title">
+        <span className="card-title-icon">📅</span>
+        <h2>Travel Plan</h2>
       </div>
 
-      <form onSubmit={handleSubmit} className="prediction-form">
-        <div className="form-group">
-          <label>Origin</label>
-          <select
-            value={formData.origin}
-            onChange={(e) => handleChange('origin', e.target.value)}
-            required
-          >
-            <option value="singapore">Singapore</option>
-            <option value="jb">Johor Bahru (JB)</option>
-          </select>
+      <div className="route-badge">{getCheckpointName()}</div>
+
+      <form onSubmit={handleSubmit}>
+        <div className="location-group">
+          <div className="location-item">
+            <div className="location-icon from">📍</div>
+            <div className="location-content">
+              <div className="location-label">FROM</div>
+              <div className="location-value">
+                {formData.origin === 'singapore' ? 'Singapore' : 'Johor Bahru'}
+              </div>
+            </div>
+          </div>
+
+          <div className="location-item">
+            <div className="location-icon swap" onClick={handleSwap}>
+              ⇅
+            </div>
+          </div>
+
+          <div className="location-item">
+            <div className="location-icon to">📍</div>
+            <div className="location-content">
+              <div className="location-label">TO</div>
+              <div className="location-value">
+                {formData.destination === 'jb' ? 'Johor Bahru' : 'Singapore'}
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="form-group">
-          <label>Destination</label>
-          <select
-            value={formData.destination}
-            onChange={(e) => handleChange('destination', e.target.value)}
-            required
-          >
-            <option value="jb">Johor Bahru (JB)</option>
-            <option value="singapore">Singapore</option>
-          </select>
+        <div className="datetime-grid">
+          <div className="datetime-group">
+            <label className="datetime-label">Date</label>
+            <input
+              type="date"
+              value={formData.travel_date}
+              onChange={(e) => handleChange('travel_date', e.target.value)}
+              className="datetime-input"
+              required
+            />
+          </div>
+
+          <div className="datetime-group">
+            <label className="datetime-label">Departure Time</label>
+            <input
+              type="time"
+              value={formData.travel_time}
+              onChange={(e) => handleChange('travel_time', e.target.value)}
+              className="datetime-input"
+              required
+            />
+          </div>
         </div>
 
-        <div className="form-group">
-          <label>Travel Date</label>
-          <DatePicker
-            selected={formData.travel_date}
-            onChange={(date) => handleChange('travel_date', date)}
-            minDate={new Date()}
-            dateFormat="yyyy-MM-dd"
-            className="date-picker"
-            required
-          />
-        </div>
-
-        <div className="form-group">
-          <label>Travel Time</label>
-          <input
-            type="time"
-            value={formData.travel_time}
-            onChange={(e) => handleChange('travel_time', e.target.value)}
-            required
-          />
-        </div>
-
-        <div className="form-group">
-          <label>Mode of Travel</label>
-          <select
-            value={formData.mode}
-            onChange={(e) => handleChange('mode', e.target.value)}
-          >
-            <option value="car">Car</option>
-            <option value="taxi">Taxi</option>
-            <option value="bus">Bus</option>
-          </select>
-        </div>
-
-        <button type="submit" className="predict-btn" disabled={loading}>
-          {loading ? 'Predicting...' : 'Predict Travel Time'}
+        <button type="submit" className="calculate-btn" disabled={loading}>
+          {loading ? 'Calculating...' : 'Calculate Travel Time'}
         </button>
       </form>
+
+      {isHolidayPeriod() && (
+        <div className="holiday-alert">
+          <div className="holiday-alert-icon">⚠️</div>
+          <div className="holiday-alert-content">
+            <div className="holiday-alert-title">Upcoming Holiday Alert</div>
+            <div className="holiday-alert-text">
+              School holidays detected. Expect heavier than usual traffic at{' '}
+              {getCheckpointName()} between 17:00 and 20:00.
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
