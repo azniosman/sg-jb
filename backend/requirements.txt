@@ -33,3 +33,6 @@ fastapi-cors==0.0.6
 # Testing (optional)
 pytest==7.4.3
 httpx==0.25.2
+
+# Visualization
+matplotlib==3.8.2
