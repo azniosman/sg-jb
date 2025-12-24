@@ -59,7 +59,30 @@ const Sidebar = ({ onPredict, loading }) => {
         <h2>Travel Plan</h2>
       </div>
 
-      <div className="route-badge">{getCheckpointName()}</div>
+      <div className="checkpoint-selector">
+        <button
+          type="button"
+          className={`checkpoint-btn ${formData.checkpoint === 'woodlands' ? 'active' : ''}`}
+          onClick={() => handleChange('checkpoint', 'woodlands')}
+        >
+          <span className="checkpoint-icon">🌉</span>
+          <div className="checkpoint-info">
+            <div className="checkpoint-name">Woodlands</div>
+            <div className="checkpoint-subtext">Causeway</div>
+          </div>
+        </button>
+        <button
+          type="button"
+          className={`checkpoint-btn ${formData.checkpoint === 'tuas' ? 'active' : ''}`}
+          onClick={() => handleChange('checkpoint', 'tuas')}
+        >
+          <span className="checkpoint-icon">🌁</span>
+          <div className="checkpoint-info">
+            <div className="checkpoint-name">Tuas</div>
+            <div className="checkpoint-subtext">Second Link</div>
+          </div>
+        </button>
+      </div>
 
       <form onSubmit={handleSubmit}>
         <div className="location-group">

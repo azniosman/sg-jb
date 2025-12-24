@@ -43,6 +43,29 @@ body {
   gap: 2rem;
 }
 
+/* Selected Checkpoint Badge */
+.selected-checkpoint-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  padding: 0.75rem 1.25rem;
+  border-radius: 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
+}
+
+.checkpoint-badge-icon {
+  font-size: 1.25rem;
+}
+
+.checkpoint-badge-text {
+  letter-spacing: 0.025em;
+}
+
 /* Info Cards Grid */
 .info-cards {
   display: grid;

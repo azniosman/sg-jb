@@ -25,9 +25,9 @@ function App() {
       setPrediction(result);
       setCurrentScenario(formData);
 
-      // Fetch wait time estimate
+      // Fetch wait time estimate using the selected checkpoint
       try {
-        const checkpoint = formData.origin.toLowerCase() === 'singapore' ? 'woodlands' : 'woodlands';
+        const checkpoint = formData.checkpoint || 'woodlands';
         const waitTime = await getWaitTime(
           checkpoint,
           formData.origin,
@@ -82,6 +82,18 @@ function App() {
 
           {prediction ? (
             <>
+              {/* Checkpoint Badge */}
+              <div className="selected-checkpoint-badge">
+                <span className="checkpoint-badge-icon">
+                  {currentScenario?.checkpoint === 'woodlands' ? '🌉' : '🌁'}
+                </span>
+                <span className="checkpoint-badge-text">
+                  {currentScenario?.checkpoint === 'woodlands'
+                    ? 'Woodlands Causeway'
+                    : 'Tuas Second Link'}
+                </span>
+              </div>
+
               {/* Info Cards Row */}
               <div className="info-cards">
                 {/* Predicted Duration Card */}

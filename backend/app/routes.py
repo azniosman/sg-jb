@@ -29,6 +29,7 @@ class PredictRequest(BaseModel):
     travel_date: date = Field(..., description="Date of travel (YYYY-MM-DD)")
     travel_time: str = Field(..., description="Time of travel (HH:MM)")
     mode: Optional[str] = Field("car", description="Mode of travel (car, taxi, bus)")
+    checkpoint: Optional[str] = Field("woodlands", description="Checkpoint (woodlands or tuas)")
 
     @validator('origin', 'destination')
     def validate_location(cls, v):
@@ -52,6 +53,15 @@ class PredictRequest(BaseModel):
         valid_modes = ['car', 'taxi', 'bus']
         if v.lower() not in valid_modes:
             raise ValueError(f"Mode must be one of: {valid_modes}")
+        return v.lower()
+
+    @validator('checkpoint')
+    def validate_checkpoint(cls, v):
+        if v is None:
+            return 'woodlands'
+        valid_checkpoints = ['woodlands', 'tuas']
+        if v.lower() not in valid_checkpoints:
+            raise ValueError(f"Checkpoint must be one of: {valid_checkpoints}")
         return v.lower()
 
 
@@ -142,8 +152,8 @@ async def predict_travel_time(request: PredictRequest, use_realtime: bool = Quer
         # Enhance with real-time traffic if requested and traveling today
         if use_realtime and request.travel_date == date.today():
             try:
-                # Determine checkpoint from origin/destination
-                checkpoint = "woodlands"  # Default, could be enhanced to detect from route
+                # Use checkpoint from request
+                checkpoint = request.checkpoint or "woodlands"
 
                 # Get real-time traffic
                 traffic_data = google_maps_api.get_live_travel_time(
@@ -168,7 +178,8 @@ async def predict_travel_time(request: PredictRequest, use_realtime: bool = Quer
             hour, minute = map(int, request.travel_time.split(':'))
             travel_dt = datetime.combine(request.travel_date, datetime.min.time().replace(hour=hour, minute=minute))
 
-            checkpoint = "woodlands"
+            # Use checkpoint from request
+            checkpoint = request.checkpoint or "woodlands"
             direction = "singapore_to_jb" if request.origin.lower() == "singapore" else "jb_to_singapore"
 
             wait_time_data = wait_time_estimator.estimate_wait_time(
